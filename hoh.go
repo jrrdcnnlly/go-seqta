@@ -85,7 +85,7 @@ func (h HeadOfHouse) String() string {
 }
 
 // getHeadOfHouseSQL returns the SQL query for [GetHoH].
-func getHeadOfHouseSQL(ex goqu.Ex) (sql string, paramns []any, err error) {
+func getHeadOfHouseSQL(ex goqu.Expression) (sql string, paramns []any, err error) {
 	return goqu.Dialect("postgres").
 		Select(
 			goqu.C("id").Table("hoh").As("hoh_id"),
@@ -128,11 +128,16 @@ func getHeadOfHouseSQL(ex goqu.Ex) (sql string, paramns []any, err error) {
 //   - dos.email					[string]
 //   - dos.username				[string]
 //   - dos.government_id	[string]
-func GetHeadOfHouse(db *sqlx.DB, ex goqu.Ex) ([]HeadOfHouse, error) {
-	ex["house.external_id"] = goqu.Op{"neq": nil}
-	ex["hoh.email"] = goqu.Op{"neq": nil}
-	ex["hoh.username"] = goqu.Op{"neq": nil}
-	ex["hoh.external_id"] = goqu.Op{"neq": nil}
+func GetHeadOfHouse(db *sqlx.DB, ex goqu.Expression) ([]HeadOfHouse, error) {
+	ex = goqu.And(
+		ex,
+		goqu.Ex{
+			"house.external_id": goqu.Op{"neq": nil},
+			"hoh.email":         goqu.Op{"neq": nil},
+			"hoh.username":      goqu.Op{"neq": nil},
+			"hoh.external_id":   goqu.Op{"neq": nil},
+		},
+	)
 
 	sql, params, err := getHeadOfHouseSQL(ex)
 	if err != nil {

@@ -85,7 +85,7 @@ func (d DirectorOfStudents) String() string {
 }
 
 // getDirectorOfStudentsSQL returns the SQL query for [GetDirectorOfStudents].
-func getDirectorOfStudentsSQL(ex goqu.Ex) (sql string, paramns []any, err error) {
+func getDirectorOfStudentsSQL(ex goqu.Expression) (sql string, paramns []any, err error) {
 	return goqu.Dialect("postgres").
 		Select(
 			goqu.C("id").Table("dos").As("dos_id"),
@@ -128,11 +128,16 @@ func getDirectorOfStudentsSQL(ex goqu.Ex) (sql string, paramns []any, err error)
 //   - dos.email						[string]
 //   - dos.username					[string]
 //   - dos.government_id		[string]
-func GetDirectorOfStudents(db *sqlx.DB, ex goqu.Ex) ([]DirectorOfStudents, error) {
-	ex["schoolyear.external_id"] = goqu.Op{"neq": nil}
-	ex["dos.email"] = goqu.Op{"neq": nil}
-	ex["dos.username"] = goqu.Op{"neq": nil}
-	ex["dos.external_id"] = goqu.Op{"neq": nil}
+func GetDirectorOfStudents(db *sqlx.DB, ex goqu.Expression) ([]DirectorOfStudents, error) {
+	ex = goqu.And(
+		ex,
+		goqu.Ex{
+			"schoolyear.external_id": goqu.Op{"neq": nil},
+			"dos.email":              goqu.Op{"neq": nil},
+			"dos.username":           goqu.Op{"neq": nil},
+			"dos.external_id":        goqu.Op{"neq": nil},
+		},
+	)
 
 	sql, params, err := getDirectorOfStudentsSQL(ex)
 	if err != nil {

@@ -39,7 +39,7 @@ func (s Subject) String() string {
 }
 
 // getSubjectSQL returns the SQL query for [GetSubject].
-func getSubjectSQL(ex goqu.Ex) (sql string, params []any, err error) {
+func getSubjectSQL(ex goqu.Expression) (sql string, params []any, err error) {
 	return goqu.Dialect("postgres").
 		Select(
 			goqu.C("id").Table("subject").As("subject_id"),
@@ -59,7 +59,7 @@ func getSubjectSQL(ex goqu.Ex) (sql string, params []any, err error) {
 //   - subject.code					[string]
 //   - subject.name					[string]
 //   - subject.description	[string]
-func GetSubject(db *sqlx.DB, ex goqu.Ex) ([]Subject, error) {
+func GetSubject(db *sqlx.DB, ex goqu.Expression) ([]Subject, error) {
 	sql, params, err := getSubjectSQL(ex)
 	if err != nil {
 		return nil, fmt.Errorf("seqta: get subject: %w", err)

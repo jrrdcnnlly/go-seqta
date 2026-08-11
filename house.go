@@ -39,7 +39,7 @@ func (h House) String() string {
 }
 
 // getHouseSQL returns the SQL query for [GetHouse].
-func getHouseSQL(ex goqu.Ex) (sql string, params []any, err error) {
+func getHouseSQL(ex goqu.Expression) (sql string, params []any, err error) {
 	return goqu.Dialect("postgres").
 		Select(
 			goqu.C("id").Table("house").As("house_id"),
@@ -85,8 +85,11 @@ func getHouseSQL(ex goqu.Ex) (sql string, params []any, err error) {
 //   - hoh.email					[string]
 //   - hoh.username				[string]
 //   - hoh.government_id	[string]
-func GetHouse(db *sqlx.DB, ex goqu.Ex) ([]House, error) {
-	ex["house.external_id"] = goqu.Op{"neq": nil}
+func GetHouse(db *sqlx.DB, ex goqu.Expression) ([]House, error) {
+	ex = goqu.And(
+		ex,
+		goqu.Ex{"house.external_id": goqu.Op{"neq": nil}},
+	)
 
 	sql, params, err := getHouseSQL(ex)
 	if err != nil {

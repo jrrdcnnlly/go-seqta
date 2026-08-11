@@ -46,7 +46,7 @@ func (c ClassUnit) String() string {
 }
 
 // getClassUnitSQL returns the SQL query for [GetClassUnit.]
-func getClassUnitSQL(loc *time.Location, ex goqu.Ex) (sql string, params []any, err error) {
+func getClassUnitSQL(loc *time.Location, ex goqu.Expression) (sql string, params []any, err error) {
 	epoch := time.Date(1979, time.January, 1, 0, 0, 0, 0, loc)
 
 	return goqu.Dialect("postgres").
@@ -94,7 +94,7 @@ func getClassUnitSQL(loc *time.Location, ex goqu.Ex) (sql string, params []any, 
 //   - term.year							[string]
 //   - term.start							[time.Time]
 //   - term.end								[time.Time]
-func GetClassUnit(db *sqlx.DB, loc *time.Location, ex goqu.Ex) ([]ClassUnit, error) {
+func GetClassUnit(db *sqlx.DB, loc *time.Location, ex goqu.Expression) ([]ClassUnit, error) {
 	sql, params, err := getClassUnitSQL(loc, ex)
 	if err != nil {
 		return nil, fmt.Errorf("seqta: get class unit: %w", err)

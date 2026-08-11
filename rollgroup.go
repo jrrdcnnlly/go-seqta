@@ -39,7 +39,7 @@ func (r RollGroup) String() string {
 }
 
 // getRollGroupSQL returns the SQL query for [GetRollGroup].
-func getRollGroupSQL(ex goqu.Ex) (sql string, params []any, err error) {
+func getRollGroupSQL(ex goqu.Expression) (sql string, params []any, err error) {
 	return goqu.Dialect("postgres").
 		Select(
 			goqu.C("id").Table("rollgroup").As("rollgroup_id"),
@@ -85,8 +85,11 @@ func getRollGroupSQL(ex goqu.Ex) (sql string, params []any, err error) {
 //   - staff.email					[string]
 //   - staff.username				[string]
 //   - staff.government_id	[string]
-func GetRollGroup(db *sqlx.DB, ex goqu.Ex) ([]RollGroup, error) {
-	ex["rollgroup.external_id"] = goqu.Op{"neq": nil}
+func GetRollGroup(db *sqlx.DB, ex goqu.Expression) ([]RollGroup, error) {
+	ex = goqu.And(
+		ex,
+		goqu.Ex{"external_id": goqu.Op{"neq": nil}},
+	)
 
 	sql, params, err := getRollGroupSQL(ex)
 	if err != nil {

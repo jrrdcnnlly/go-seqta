@@ -93,7 +93,7 @@ func (s Student) String() string {
 }
 
 // getStudentSQL returns the SQL query for [GetStudent].
-func getStudentSQL(ex goqu.Ex) (sql string, params []any, err error) {
+func getStudentSQL(ex goqu.Expression) (sql string, params []any, err error) {
 	return goqu.Dialect("postgres").
 		Select(
 			goqu.C("id").Table("student").As("student_id"),
@@ -188,10 +188,15 @@ func getStudentSQL(ex goqu.Ex) (sql string, params []any, err error) {
 		ToSQL()
 }
 
-func GetStudent(db *sqlx.DB, ex goqu.Ex) ([]Student, error) {
-	ex["student.email"] = goqu.Op{"neq": nil}
-	ex["student.username"] = goqu.Op{"neq": nil}
-	ex["student.external_id"] = goqu.Op{"neq": nil}
+func GetStudent(db *sqlx.DB, ex goqu.Expression) ([]Student, error) {
+	ex = goqu.And(
+		ex,
+		goqu.Ex{
+			"student.email":       goqu.Op{"neq": nil},
+			"student.username":    goqu.Op{"neq": nil},
+			"student.external_id": goqu.Op{"neq": nil},
+		},
+	)
 
 	sql, params, err := getStudentSQL(ex)
 	if err != nil {

@@ -67,7 +67,7 @@ func (t Term) String() string {
 }
 
 // getTermSQL returns the SQL query for [GetTerm].
-func getTermSQL(loc *time.Location, ex goqu.Ex) (sql string, params []any, err error) {
+func getTermSQL(loc *time.Location, ex goqu.Expression) (sql string, params []any, err error) {
 	epoch := time.Date(1979, time.January, 1, 0, 0, 0, 0, loc)
 
 	return goqu.Dialect("postgres").
@@ -91,7 +91,7 @@ func getTermSQL(loc *time.Location, ex goqu.Ex) (sql string, params []any, err e
 //   - term.year		[string]
 //   - term.start		[time.Time]
 //   - term.end			[time.Time]
-func GetTerm(db *sqlx.DB, loc *time.Location, ex goqu.Ex) ([]Term, error) {
+func GetTerm(db *sqlx.DB, loc *time.Location, ex goqu.Expression) ([]Term, error) {
 	sql, params, err := getTermSQL(loc, ex)
 	if err != nil {
 		return nil, fmt.Errorf("seqta: get term: %w", err)

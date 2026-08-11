@@ -85,7 +85,7 @@ func (s Staff) String() string {
 }
 
 // getStaffSQL returns the SQL query for [GetStaff].
-func getStaffSQL(ex goqu.Ex) (sql string, params []any, err error) {
+func getStaffSQL(ex goqu.Expression) (sql string, params []any, err error) {
 	return goqu.Dialect("postgres").
 		Select(
 			goqu.C("id").Table("staff").As("staff_id"),
@@ -117,10 +117,15 @@ func getStaffSQL(ex goqu.Ex) (sql string, params []any, err error) {
 //   - staff.email						[string]
 //   - staff.username					[string]
 //   - staff.government_id		[string]
-func GetStaff(db *sqlx.DB, ex goqu.Ex) ([]Staff, error) {
-	ex["staff.email"] = goqu.Op{"neq": nil}
-	ex["staff.username"] = goqu.Op{"neq": nil}
-	ex["staff.external_id"] = goqu.Op{"neq": nil}
+func GetStaff(db *sqlx.DB, ex goqu.Expression) ([]Staff, error) {
+	ex = goqu.And(
+		ex,
+		goqu.Ex{
+			"staff.email":       goqu.Op{"neq": nil},
+			"staff.username":    goqu.Op{"neq": nil},
+			"staff.external_id": goqu.Op{"neq": nil},
+		},
+	)
 
 	sql, params, err := getStaffSQL(ex)
 	if err != nil {

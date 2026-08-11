@@ -39,7 +39,7 @@ func (s SchoolYear) String() string {
 }
 
 // getSchoolYearSQL returns the SQL query for [GetSchoolYear].
-func getSchoolYearSQL(ex goqu.Ex) (sql string, params []any, err error) {
+func getSchoolYearSQL(ex goqu.Expression) (sql string, params []any, err error) {
 	return goqu.Dialect("postgres").
 		Select(
 			goqu.C("id").Table("schoolyear").As("schoolyear_id"),
@@ -85,8 +85,11 @@ func getSchoolYearSQL(ex goqu.Ex) (sql string, params []any, err error) {
 //   - dos.email					[string]
 //   - dos.username				[string]
 //   - dos.government_id	[string]
-func GetSchoolYear(db *sqlx.DB, ex goqu.Ex) ([]SchoolYear, error) {
-	ex["schoolyear.external_id"] = goqu.Op{"neq": nil}
+func GetSchoolYear(db *sqlx.DB, ex goqu.Expression) ([]SchoolYear, error) {
+	ex = goqu.And(
+		ex,
+		goqu.Ex{"schoolyear.external_id": goqu.Op{"neq": nil}},
+	)
 
 	sql, params, err := getSchoolYearSQL(ex)
 	if err != nil {
